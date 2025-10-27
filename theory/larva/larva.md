@@ -13,7 +13,7 @@ The default `stub4testtool.xsl` replaces senders that access external systems by
 
 ### Writing Larva tests
 
-An example project is in directory [examples/larva](../../examples/larva/). The configuration to be tested is [examples/larva/configurations/hermesBridge/ConfigurationToConscience.xml](../..examples/larva/configurations/hermesBridge/ConfigurationToConscience.xml). It has one adapter named `adapterToConscience`. In the adapter is a `SenderPipe` named `pipeCallConscience`.
+An example project is in directory [examples/larva](../../examples/larva/). The configuration to be tested is [examples/larva/configurations/hermesBridge/ConfigurationToConscience.xml](../../examples/larva/configurations/hermesBridge/ConfigurationToConscience.xml). It has one adapter named `adapterToConscience`. In the adapter is a `SenderPipe` named `pipeCallConscience`.
 
 After stubbing, the adapter can be accessed by a listener with service name `testtool-adapterToConscience`. The replacement sender has service name `testtool-pipeCallConscience`. The Larva test defines services to access them in file [examples/larva/tests/hermesBridge/common.properties](../../examples/larva/tests/hermesBridge/common.properties).
 
