@@ -31,7 +31,7 @@ Larva tests can be executed by opening Testing | Larva from the main menu. The r
 
 ### Syntax of Larva tests
 
-Larva tests are property files that can include other properties files. The following kinds of statements exist: (a) service definitions, (b) test command, (c) include statement and (d) description definition.
+Larva tests are property files that can include other properties files. The following kinds of statements exist: (a) service definition, (b) test command, (c) include statement and (d) description definition.
 
 **Service definition**: Service definition lines have properties with three words, like ``service.name.propertyName``. A service name always has two words. It is good practice to use ``adapter`` or ``stub`` for the first word, making clear the role this service plays in your tests. Each service has a property ``className`` that identifies the kind of service by a Java classname. Each kind of service defines different properties.
 
