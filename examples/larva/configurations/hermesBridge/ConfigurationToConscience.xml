@@ -1,0 +1,67 @@
+<!--
+The Rotterdam Bank is a bank that provides current accounts and savings
+accounts to their customers. The Rotterdam Bank has purchased the Hermes system
+to send paper statements of account. Hermes comes from an external company. To
+the Rotterdam Bank it is very important to have the proper contact information
+of their relations. They have a dedicated department for maintaining this data.
+The department maintains a system called Conscience to make this data
+available. Conscience also needs to be accessed by Hermes, because Hermes
+includes customer addresses in the statements of account.
+
+The problem to be solved is that the interfaces of Hermes and Conscience are
+not compatible. When Hermes needs an address, it sends out a RESTful HTTP GET
+request. An example of the request body is in:
+
+tests/hermesBridge/scenario01/hermesAddressRequest.xml
+
+Hermes expects a response like shown in file:
+
+tests/hermesBridge/scenario01/hermesAddressResponse.xml
+
+Conscience expects address requests like shown in file:
+
+tests/hermesBridge/scenario01/conscienceAddressRequest.xml
+
+Conscience responds like shown in file:
+
+tests/hermesBridge/scenario01/conscienceAddressResponse.xml
+-->
+
+<Module
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="../FrankConfig.xsd">
+  <Adapter name="adapterToConscience">
+    <Receiver name="receiverToConscience">
+      <ApiListener 
+      name="listenerToConscience"
+      uriPattern="adapter/hermes/address"
+      method="GET"
+      allowAllParams="false"/>
+    </Receiver>
+    <Pipeline firstPipe="pipeTranslateRequest">
+      <Exits>
+        <Exit name="Exit" state="SUCCESS" code="200"/>
+      </Exits>
+      <XsltPipe
+      name="pipeTranslateRequest"
+      styleSheetName="hermesRequest2ConscienceRequest.xsl"
+      xsltVersion="2">
+        <Forward name="success" path="pipeCallConscience"/>
+      </XsltPipe>
+      <SenderPipe name="pipeCallConscience">
+        <HttpSender
+          name="senderCallConscience"
+          url="http://localhost/conscience/address"
+          methodType="GET">
+        </HttpSender>
+        <Forward name="success" path="pipeTranslateAddress"/>
+      </SenderPipe>
+      <XsltPipe
+      name="pipeTranslateAddress"
+      styleSheetName="conscienceAddress2HermesAddress.xsl"
+      xsltVersion="2">
+        <Forward name="success" path="Exit"/>
+      </XsltPipe>
+    </Pipeline>
+  </Adapter>
+</Module>
