@@ -1,0 +1,107 @@
+# Database vendor specific information for **resources.yml**
+
+### **type** field
+
+The **type** field should be a Java class name referencing a data source. It is possible but discouraged to reference a database driver. You have two options when choosing a datasource: a datasource that supports XA transactions or a datasource that does not.
+
+The following table shows non-XA datasources by database brand:
+
+Brand | non-XA datasource
+----- | -----------------
+PostgreSQL | ``org.postgresql.ds.PGSimpleDataSource``
+MariaDB | ``org.mariadb.jdbc.MariaDbDataSource``
+MySQL | ``com.mysql.cj.jdbc.MysqlDataSource``
+MS SQL | ``com.microsoft.sqlserver.jdbc.SQLServerDataSource``
+Oracle | ``oracle.jdbc.pool.OracleDataSource``
+H2 | ``org.h2.jdbcx.JdbcDataSource``
+
+The following table shows XA datasources. To use them, you have to enable a transaction manager like Narayana:
+
+Brand | XA datasource
+----- | -------------
+PostgreSQL | ``org.postgresql.xa.PGXADataSource``
+MariaDB | ``org.mariadb.jdbc.MariaDbDataSource``
+MySQL | ``com.mysql.cj.jdbc.MysqlXADataSource``
+MS SQL | ``com.microsoft.sqlserver.jdbc.SQLServerXADataSource``
+Oracle | ``oracle.jdbc.xa.client.OracleXADataSource``
+H2 | ``org.h2.jdbcx.JdbcDataSource``
+
+The table below shows the database drivers. Its usage is discouraged but they may be used.
+
+Brand | Driver
+----- | ------
+PostgreSQL | ``org.postgresql.Driver``
+MariaDB | ``org.mariadb.jdbc.Driver``
+MySQL | ``com.mysql.cj.jdbc.Driver``
+MS SQL | ``com.microsoft.sqlserver.jdbc.SQLServerDriver``
+Oracle | ``oracle.jdbc.driver.OracleDriver``
+H2 | ``org.h2.Driver``
+
+The following table shows a basic template for the ``url`` field of ``resources.yml`` for each database brand.
+
+Brand | URL template
+----- | ------------
+PostgreSQL | ``jdbc:postgresql://<host>:5432/<name of database>``
+MariaDB | ``jdbc:mariadb://<host>:3306/<name of database>``
+MySQL | ``jdbc:mysql://<host>:3306/<name of database>``
+MS SQL | ``jdbc:sqlserver://<host>:1433;database=<name of database>``
+Oracle | ``jdbc:oracle:thin:@<host>:1521:<name of database>``
+H2 | ``jdbc:h2:mem:<name of database>`` for in-memory or ``jdbc:h2:<directory name>/<name of database>`` to store the data in file(s)
+
+**host:** IP address or DNS name.
+
+**name of database:** Database vendors have different terms: database, service, sid and more.
+
+Every shown URL has a port number. It is possible to omit the port number; the shown port number is the default in that case. It is also possible to work with a different port, but then the database has to be configured to listen to that other port.
+
+Some database vendors support more URL syntaxes than shown here. These possibilities are beyond the scope of this manual. See also https://www.netiq.com/documentation/identity-manager-49-drivers/jdbc/data/supported-third-party-jdbc-drivers.html#t47303hry5lw. and https://www.baeldung.com/java-jdbc-url-format.
+
+The following table shows for each database brand where the vendor-specific library can be downloaded:
+
+Brand | URL to download library
+----- | -----------------------
+PostgreSQL | https://central.sonatype.com/artifact/org.postgresql/postgresql/versions
+MariaDB | https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+MySQL | https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+MS SQL | https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc, JRE 11 versions work even though the FF! uses JRE 21.
+Oracle | https://mvnrepository.com/artifact/com.oracle.database.jdbc/ojdbc11
+H2 | https://mvnrepository.com/artifact/com.h2database/h2
+
+Each of these URLs provides an overview of all released versions. It depends on the FF! version you are using and on the application server which versions will work.
+
+### Additional details
+
+This page continues with vendor-specific details that does not fit within the above tables.
+
+### PostgreSQL
+
+If you want to use XA transactions, you have to set a property within the database: `max_prepared_transactions`. You can do this by executing the following query:
+
+```
+ALTER SYSTEM SET max_prepared_transactions = 100;
+```
+
+If this propery is not set, XA transactions may be rolled back unexpectedly. This problem may manifest itself with the following Java stacktrace in the log:
+
+```
+...
+Caused by: org.postgresql.util.PSQLException: ERROR: prepared transactions are disabled
+	Hint: Set "max_prepared_transactions" to a nonzero value.
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2733) ~[postgresql.jar:42.7.4]
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2420) ~[postgresql.jar:42.7.4]
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:517) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:434) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:356) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:341) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:317) ~[postgresql.jar:42.7.4]
+	at org.postgresql.jdbc.PgStatement.executeUpdate(PgStatement.java:290) ~[postgresql.jar:42.7.4]
+	at org.postgresql.xa.PGXAConnection.prepare(PGXAConnection.java:357) ~[postgresql.jar:42.7.4]
+	... 20 more
+...
+```
+
+H2
+---
+
+For H2 databases, it is recommended to configure properties ``DB_CLOSE_DELAY=-1``, ``DB_CLOSE_ON_EXIT=FALSE``, ``AUTO_RECONNECT=TRUE`` and ``MODE=Post``. These are properties for the ``properties`` field of ``resources.yml``.

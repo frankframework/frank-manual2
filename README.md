@@ -5,3 +5,4 @@ If you are new to the Frank!Framework then please start learning at the [Frank!A
 # Table of contents
 
 [Larva](./theory/larva/larva.md)
+[DatabaseVendor](./theory/databaseVendor/databaseVendor.md)
