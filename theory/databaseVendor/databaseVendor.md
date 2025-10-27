@@ -26,7 +26,7 @@ MS SQL | ``com.microsoft.sqlserver.jdbc.SQLServerXADataSource``
 Oracle | ``oracle.jdbc.xa.client.OracleXADataSource``
 H2 | ``org.h2.jdbcx.JdbcDataSource``
 
-The table below shows the database drivers. Its usage is discouraged but they may be used.
+The table below shows the database drivers. Their usage is discouraged but they may be used.
 
 Brand | Driver
 ----- | ------
